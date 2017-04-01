@@ -1,0 +1,12 @@
+HeuristicWeightGenomes.xml
+HeuristicWeightGenomes2.xml
+results.txt
+results2.txt
+JGAPExample26.xml
+bin/*
+
+src/PlayerSkeleton.java
+src/State.java
+src/TFrame.java
+src/TLabel.java
+src/readme.txt
