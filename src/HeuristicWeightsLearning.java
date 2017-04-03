@@ -1,4 +1,5 @@
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -9,9 +10,11 @@ import org.jgap.Gene;
 import org.jgap.Genotype;
 import org.jgap.IChromosome;
 import org.jgap.InvalidConfigurationException;
+import org.jgap.UnsupportedRepresentationException;
 import org.jgap.audit.EvolutionMonitor;
 import org.jgap.data.DataTreeBuilder;
 import org.jgap.data.IDataCreators;
+import org.jgap.impl.CrossoverOperator;
 import org.jgap.impl.DefaultConfiguration;
 import org.jgap.impl.DoubleGene;
 import org.jgap.impl.MutationOperator;
@@ -34,7 +37,8 @@ public class HeuristicWeightsLearning {
 		conf.setPreservFittestIndividual(true);
 		conf.setKeepPopulationSizeConstant(false);
 		conf.setPopulationSize(popSize);
-		conf.addGeneticOperator(new MutationOperator(conf, 20));
+		conf.addGeneticOperator(new MutationOperator(conf, 2));
+		conf.addGeneticOperator(new CrossoverOperator(conf));
 
 		// Set Fitness Function
 		FitnessFunction fitFunc = new HeuristicWeightsFitnessFuction();
@@ -59,7 +63,18 @@ public class HeuristicWeightsLearning {
 		sampleGenes[8] = new DoubleGene(conf, -1d, 1d); // Constant for H3
 		IChromosome sampleChromosome = new Chromosome(conf, sampleGenes);
 		conf.setSampleChromosome(sampleChromosome);
-		Genotype population = Genotype.randomInitialGenotype(conf);
+		Genotype population;
+
+		try {
+			Document doc = XMLManager.readFile(new File("HeuristicWeightGenomes2.xml"));
+			population = XMLManager.getGenotypeFromDocument(conf, doc);
+		} catch (UnsupportedRepresentationException uex) {
+			// JGAP codebase might have changed between two consecutive runs.
+			// --------------------------------------------------------------
+			population = Genotype.randomInitialGenotype(conf);
+		} catch (FileNotFoundException fex) {
+			population = Genotype.randomInitialGenotype(conf);
+		}
 
 		// ------ Start -------
 
@@ -72,17 +87,18 @@ public class HeuristicWeightsLearning {
 			}
 			System.out.printf("Evolution no. %d, Current Fittest Fitness Value is: %f%n", i + 1,
 					population.getFittestChromosome().getFitnessValue());
+
+			// Build Document
+			DataTreeBuilder builder = DataTreeBuilder.getInstance();
+			IDataCreators doc2 = builder.representGenotypeAsDocument(population);
+			// create XML document from generated tree
+			XMLDocumentBuilder docbuilder = new XMLDocumentBuilder();
+			Document xmlDoc = (Document) docbuilder.buildDocument(doc2);
+			XMLManager.writeFile(xmlDoc, new File("HeuristicWeightGenomes2_end.xml"));
+
 		}
 		long endTime = System.currentTimeMillis();
 		System.out.println("Total evolution time: " + (endTime - startTime) + " ms");
-
-		// Build Document
-		DataTreeBuilder builder = DataTreeBuilder.getInstance();
-		IDataCreators doc2 = builder.representGenotypeAsDocument(population);
-		// create XML document from generated tree
-		XMLDocumentBuilder docbuilder = new XMLDocumentBuilder();
-		Document xmlDoc = (Document) docbuilder.buildDocument(doc2);
-		XMLManager.writeFile(xmlDoc, new File("HeuristicWeightGenomes2.xml"));
 
 		// Print results
 		IChromosome bestSolutionSoFar = population.getFittestChromosome();
