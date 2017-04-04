@@ -5,6 +5,7 @@ import java.io.PrintWriter;
 
 import org.jgap.Chromosome;
 import org.jgap.Configuration;
+import org.jgap.DefaultFitnessEvaluator;
 import org.jgap.FitnessFunction;
 import org.jgap.Gene;
 import org.jgap.Genotype;
@@ -14,10 +15,11 @@ import org.jgap.UnsupportedRepresentationException;
 import org.jgap.audit.EvolutionMonitor;
 import org.jgap.data.DataTreeBuilder;
 import org.jgap.data.IDataCreators;
-import org.jgap.impl.CrossoverOperator;
-import org.jgap.impl.DefaultConfiguration;
+import org.jgap.event.EventManager;
 import org.jgap.impl.DoubleGene;
+import org.jgap.impl.GaussianRandomGenerator;
 import org.jgap.impl.MutationOperator;
+import org.jgap.impl.StandardPostSelector;
 import org.jgap.xml.XMLDocumentBuilder;
 import org.jgap.xml.XMLManager;
 import org.w3c.dom.Document;
@@ -33,12 +35,17 @@ public class HeuristicWeightsLearning {
 
 		// ----------- Configuration ----------
 
-		Configuration conf = new DefaultConfiguration();
-		conf.setPreservFittestIndividual(true);
+		Configuration conf = new Configuration();
+		// conf.setPreservFittestIndividual(true);
 		conf.setKeepPopulationSizeConstant(false);
 		conf.setPopulationSize(popSize);
-		conf.addGeneticOperator(new MutationOperator(conf, 2));
-		conf.addGeneticOperator(new CrossoverOperator(conf));
+
+		conf.setRandomGenerator(new GaussianRandomGenerator());
+		conf.setEventManager(new EventManager());
+		conf.setFitnessEvaluator(new DefaultFitnessEvaluator());
+		conf.addNaturalSelector(new StandardPostSelector(conf), true);
+		conf.addGeneticOperator(new MutationOperator(conf, 10));
+		conf.addGeneticOperator(new UniformCrossoverOperator(conf, 1));
 
 		// Set Fitness Function
 		FitnessFunction fitFunc = new HeuristicWeightsFitnessFuction();
@@ -66,7 +73,7 @@ public class HeuristicWeightsLearning {
 		Genotype population;
 
 		try {
-			Document doc = XMLManager.readFile(new File("HeuristicWeightGenomes2.xml"));
+			Document doc = XMLManager.readFile(new File("GA_mutate10_co1.xml"));
 			population = XMLManager.getGenotypeFromDocument(conf, doc);
 		} catch (UnsupportedRepresentationException uex) {
 			// JGAP codebase might have changed between two consecutive runs.
@@ -94,7 +101,7 @@ public class HeuristicWeightsLearning {
 			// create XML document from generated tree
 			XMLDocumentBuilder docbuilder = new XMLDocumentBuilder();
 			Document xmlDoc = (Document) docbuilder.buildDocument(doc2);
-			XMLManager.writeFile(xmlDoc, new File("HeuristicWeightGenomes2_end.xml"));
+			XMLManager.writeFile(xmlDoc, new File("GA_mutate10_co1.xml"));
 
 		}
 		long endTime = System.currentTimeMillis();
@@ -116,7 +123,7 @@ public class HeuristicWeightsLearning {
 
 		// Save in file
 		try {
-			PrintWriter writer = new PrintWriter("results2.txt", "UTF-8");
+			PrintWriter writer = new PrintWriter("results.txt", "UTF-8");
 			writer.println("The best solution has a fitness value of " + bestSolutionSoFar.getFitnessValue());
 			writer.println("It contains the following: ");
 			writer.printf("\tW1 is %f%n", (double) bestSolutionSoFar.getGene(0).getAllele());

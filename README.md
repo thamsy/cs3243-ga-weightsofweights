@@ -12,3 +12,9 @@ Genetic Algorithm, learning weights of game state, used for weights of features.
 
 Run the HeuristicWeightsLearning class with two arguments: (1) int of population size, (2) int of number of evolutions
 `java HeuristicWeightsLearning 1000 50`
+
+
+## TODO
+* make tournament selection or some selection criteria
+* make function-ed features
+* make feature based GA

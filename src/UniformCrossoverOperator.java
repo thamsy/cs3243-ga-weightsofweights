@@ -1,3 +1,5 @@
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Vector;
 
@@ -31,6 +33,8 @@ public class UniformCrossoverOperator extends CrossoverOperator {
 		}
 		RandomGenerator generator = getConfiguration().getRandomGenerator();
 		IGeneticOperatorConstraint constraint = getConfiguration().getJGAPFactory().getGeneticOperatorConstraint();
+		a_population.sortByFitness();
+		List<IChromosome> chromosomes = a_population.getChromosomes();
 		// For each crossover, grab two random chromosomes, pick a random
 		// locus (gene location), and then swap that gene and all genes
 		// to the "right" (those with greater loci) of that gene between
@@ -38,11 +42,22 @@ public class UniformCrossoverOperator extends CrossoverOperator {
 		// --------------------------------------------------------------
 		int index1, index2;
 		//
+
+		IChromosome[] newPop = new IChromosome[a_population.size()];
+		for (int j = 0; j < newPop.length; j++) {
+			newPop[j] = (IChromosome) a_population.getChromosome(j).clone();
+		}
+
+		HashSet<Integer> changedChromosomes = new HashSet<Integer>();
+
 		for (int i = 0; i < numCrossovers; i++) {
-			index1 = generator.nextInt(size);
-			index2 = generator.nextInt(size);
-			IChromosome chrom1 = a_population.getChromosome(index1);
-			IChromosome chrom2 = a_population.getChromosome(index2);
+			index1 = generator.nextInt(arithSum(size));
+			index2 = generator.nextInt(arithSum(size));
+			changedChromosomes.add(undoArithSum(index1));
+			changedChromosomes.add(undoArithSum(index2));
+			IChromosome chrom1 = newPop[undoArithSum(index1)];
+			IChromosome chrom2 = newPop[undoArithSum(index2)];
+
 			// Verify that crossover is allowed.
 			// ---------------------------------
 			if (!isXoverNewAge() && chrom1.getAge() < 1 && chrom2.getAge() < 1) {
@@ -64,24 +79,27 @@ public class UniformCrossoverOperator extends CrossoverOperator {
 			}
 			// Clone the chromosomes.
 			// ----------------------
-			IChromosome firstMate = (IChromosome) chrom1.clone();
-			IChromosome secondMate = (IChromosome) chrom2.clone();
+			// IChromosome firstMate = (IChromosome) chrom1.clone();
+			// IChromosome secondMate = (IChromosome) chrom2.clone();
 			// In case monitoring is active, support it.
 			// -----------------------------------------
-			if (m_monitorActive) {
-				firstMate.setUniqueIDTemplate(chrom1.getUniqueID(), 1);
-				firstMate.setUniqueIDTemplate(chrom2.getUniqueID(), 2);
-				secondMate.setUniqueIDTemplate(chrom1.getUniqueID(), 1);
-				secondMate.setUniqueIDTemplate(chrom2.getUniqueID(), 2);
-			}
+			// if (m_monitorActive) {
+			// firstMate.setUniqueIDTemplate(chrom1.getUniqueID(), 1);
+			// firstMate.setUniqueIDTemplate(chrom2.getUniqueID(), 2);
+			// secondMate.setUniqueIDTemplate(chrom1.getUniqueID(), 1);
+			// secondMate.setUniqueIDTemplate(chrom2.getUniqueID(), 2);
+			// }
 			// Cross over the chromosomes.
 			// ---------------------------
-			doCrossover(firstMate, secondMate, a_candidateChromosomes, generator);
+			doCrossover(chrom1, chrom2, generator);
+		}
+
+		for (Integer i : changedChromosomes) {
+			a_candidateChromosomes.add(newPop[i]);
 		}
 	}
 
-	protected void doCrossover(IChromosome firstMate, IChromosome secondMate, List a_candidateChromosomes,
-			RandomGenerator generator) {
+	protected void doCrossover(IChromosome firstMate, IChromosome secondMate, RandomGenerator generator) {
 		Gene[] firstGenes = firstMate.getGenes();
 		Gene[] secondGenes = secondMate.getGenes();
 		int locus = generator.nextInt(firstGenes.length);
@@ -121,8 +139,23 @@ public class UniformCrossoverOperator extends CrossoverOperator {
 		// they'll be considered for natural selection during the next
 		// phase of evolution.
 		// -----------------------------------------------------------
-		a_candidateChromosomes.add(firstMate);
-		a_candidateChromosomes.add(secondMate);
+		// a_candidateChromosomes.add(firstMate);
+		// a_candidateChromosomes.add(secondMate);
 	}
 
+	private int arithSum(int i) {
+		return i * (i + 1) / 2;
+	}
+
+	private int undoArithSum(int j) {
+		return (int) Math.floor((Math.sqrt((double) (1 + 2 * j)) - 1) / 2);
+	}
+
+	class ChromosomeComparator implements Comparator<IChromosome> {
+		@Override
+		public int compare(IChromosome o1, IChromosome o2) {
+			return (int) (o1.getFitnessValue() - o2.getFitnessValue());
+		}
+
+	}
 }
