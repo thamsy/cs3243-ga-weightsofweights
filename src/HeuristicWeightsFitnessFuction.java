@@ -4,7 +4,7 @@ import org.jgap.IChromosome;
 
 public class HeuristicWeightsFitnessFuction extends FitnessFunction {
 
-	public static final int MAX_PIECES = 2000;
+	public static final int MAX_PIECES = 200000;
 	public static final int NUM_GAMES = 10;
 
 	// Returns value of fitness function
@@ -48,7 +48,7 @@ public class HeuristicWeightsFitnessFuction extends FitnessFunction {
 		int[] newTop = new int[State.COLS];
 		int bestRot = 0;
 		int bestPos = 0;
-		double bestValue = Double.MIN_VALUE;
+		double bestValue = -Double.MAX_VALUE;
 
 		int nextPiece = s.getNextPiece();
 		int[][] legalMoves = s.legalMoves();
@@ -68,7 +68,7 @@ public class HeuristicWeightsFitnessFuction extends FitnessFunction {
 				minHeight = Math.min(minHeight, s.getTop()[c]);
 				// sum of difference of consecutive heights
 				if (c > 0)
-					bumpiness += newTop[c] - newTop[c - 1];
+					bumpiness += (newTop[c] - newTop[c - 1]) * (newTop[c] - newTop[c - 1]);
 				for (int r = State.ROWS - 1; r >= 0; --r) {
 					if (newField[r][c]) {
 						blocked = true;
@@ -118,7 +118,7 @@ public class HeuristicWeightsFitnessFuction extends FitnessFunction {
 			// " << top[leftPosition] << endl;
 			// cout << " You lost :( " << height +
 			// pHeight[pieceIndex][rotationIndex] << endl;
-			return -1;
+			return -10;
 		}
 
 		// for each column in the piece - fill in the appropriate blocks
@@ -168,9 +168,11 @@ public class HeuristicWeightsFitnessFuction extends FitnessFunction {
 
 	private double calculateValueOfField(double[] weights, int maxHeight, int minHeight, int rowsCleared, int holes,
 			int bumpiness) {
-		return (weights[0] * maxHeight + weights[1] * minHeight + weights[2]) * Math.pow(2, rowsCleared) / 10
-				+ (weights[3] * maxHeight + weights[4] * minHeight + weights[5]) * (double) holes / 10
-				+ (weights[6] * maxHeight + weights[7] * minHeight + weights[8]) * (double) bumpiness / 10;
+		return (weights[0] * maxHeight + weights[1] * (maxHeight - minHeight) + weights[2]) * (double) rowsCleared
+				* Math.abs(rowsCleared) / 5
+				+ (weights[3] * maxHeight + weights[4] * (maxHeight - minHeight) + weights[5]) * (double) holes / 10
+				+ (weights[6] * maxHeight + weights[7] * (maxHeight - minHeight) + weights[8]) * (double) bumpiness
+						/ 1000;
 	}
 
 	// ----- Main Heuristics ------
