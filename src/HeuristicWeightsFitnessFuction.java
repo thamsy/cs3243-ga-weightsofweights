@@ -56,42 +56,31 @@ public class HeuristicWeightsFitnessFuction extends FitnessFunction {
 			int rot = legalMoves[i][State.ORIENT];
 			int pos = legalMoves[i][State.SLOT];
 			int rowsCleared = performMove(s, newField, newTop, nextPiece, rot, pos);
-			int holes = 0;
+			// int holes = 0;
 			int blockade = 0;
 			int bumpiness = 0;
 			int maxHeight = 0;
 			int minHeight = State.ROWS;
 
 			for (int c = 0; c < State.COLS; ++c) {
-				boolean blocked = false;
 				// total height
 				maxHeight = Math.max(maxHeight, s.getTop()[c]);
 				minHeight = Math.min(minHeight, s.getTop()[c]);
 				// sum of difference of consecutive heights
 				if (c > 0)
 					bumpiness += (newTop[c] - newTop[c - 1]) * (newTop[c] - newTop[c - 1]);
-				for (int r = State.ROWS - 1; r >= 0; --r) {
-					if (newField[r][c]) {
-						blocked = true;
-					} else if (!newField[r][c] && blocked) {
-						// number of holes
-						holes += 1;
-					}
-				}
-
-				blocked = false;
-				for (int r = 0; r < newTop[c]; r++) {
+				boolean blocked = false;
+				for (int r = 0; r <= newTop[c]; r++) {
 					if (!newField[r][c]) {
 						blocked = true;
 					} else if (newField[r][c] && blocked) {
 						// number of holes
-						blockade += 1;
+						blockade++;
 					}
 				}
 			}
 
-			double value = calculateValueOfField(weights, maxHeight, minHeight, rowsCleared, holes, blockade,
-					bumpiness);
+			double value = calculateValueOfField(weights, maxHeight, minHeight, rowsCleared, blockade, bumpiness);
 			if (value > bestValue) {
 				bestValue = value;
 				bestRot = rot;
@@ -178,11 +167,10 @@ public class HeuristicWeightsFitnessFuction extends FitnessFunction {
 		return rowsCleared;
 	}
 
-	private double calculateValueOfField(double[] weights, int maxHeight, int minHeight, int rowsCleared, int holes,
-			int blockade, int bumpiness) {
+	private double calculateValueOfField(double[] weights, int maxHeight, int minHeight, int rowsCleared, int blockade,
+			int bumpiness) {
 		return weights[0] * (double) maxHeight / 20 + weights[1] * (double) rowsCleared * Math.abs(rowsCleared) / 5
-				+ weights[2] * (double) holes / 10 + weights[3] * (double) blockade / 20
-				+ weights[4] * (double) bumpiness / 1000;
+				+ weights[2] * (double) blockade / 10 + weights[3] * (double) bumpiness / 1000;
 	}
 
 	// ----- Main Heuristics ------

@@ -29,7 +29,7 @@ public class HeuristicWeightsLearning {
 	// The total number of times we'll let the population evolve.
 	private static final int MAX_ALLOWED_EVOLUTIONS = 45000;
 	private static final int POPULATION_SIZE = 1000;
-	private static final String FILENAME = "GA_blockadefeature_mutate4_co1.xml";
+	private static final String FILENAME = "GA_blockadefeature_removeholes_mutate2_co1.xml";
 	public static EvolutionMonitor m_monitor;
 
 	private static void doLearning(int popSize, int numEvo, boolean a_doMonitor) throws Exception {
@@ -45,7 +45,7 @@ public class HeuristicWeightsLearning {
 		conf.setEventManager(new EventManager());
 		conf.setFitnessEvaluator(new DefaultFitnessEvaluator());
 		conf.addNaturalSelector(new StandardPostSelector(conf), true);
-		conf.addGeneticOperator(new MutationOperator(conf, 4));
+		conf.addGeneticOperator(new MutationOperator(conf, 2));
 		conf.addGeneticOperator(new UniformCrossoverOperator(conf, 1));
 
 		// Set Fitness Function
@@ -59,12 +59,11 @@ public class HeuristicWeightsLearning {
 		}
 
 		// Set Genes
-		Gene[] sampleGenes = new Gene[5];
+		Gene[] sampleGenes = new Gene[4];
 		sampleGenes[0] = new DoubleGene(conf, -1d, 1d); // MaxHeight
 		sampleGenes[1] = new DoubleGene(conf, -1d, 1d); // Lines cleared
-		sampleGenes[2] = new DoubleGene(conf, -1d, 1d); // Holes
-		sampleGenes[3] = new DoubleGene(conf, -1d, 1d); // Blockade
-		sampleGenes[4] = new DoubleGene(conf, -1d, 1d); // Bumpiness
+		sampleGenes[2] = new DoubleGene(conf, -1d, 1d); // Blockade
+		sampleGenes[3] = new DoubleGene(conf, -1d, 1d); // Bumpiness
 		IChromosome sampleChromosome = new Chromosome(conf, sampleGenes);
 		conf.setSampleChromosome(sampleChromosome);
 		Genotype population;
@@ -112,7 +111,6 @@ public class HeuristicWeightsLearning {
 		System.out.printf("\tW2 is %f%n", (double) bestSolutionSoFar.getGene(1).getAllele());
 		System.out.printf("\tW3 is %f%n", (double) bestSolutionSoFar.getGene(2).getAllele());
 		System.out.printf("\tW4 is %f%n", (double) bestSolutionSoFar.getGene(3).getAllele());
-		System.out.printf("\tW5 is %f%n", (double) bestSolutionSoFar.getGene(4).getAllele());
 
 		// Save in file
 		try {
@@ -123,7 +121,6 @@ public class HeuristicWeightsLearning {
 			writer.printf("\tW2 is %f%n", (double) bestSolutionSoFar.getGene(1).getAllele());
 			writer.printf("\tW3 is %f%n", (double) bestSolutionSoFar.getGene(2).getAllele());
 			writer.printf("\tW4 is %f%n", (double) bestSolutionSoFar.getGene(3).getAllele());
-			writer.printf("\tW5 is %f%n", (double) bestSolutionSoFar.getGene(4).getAllele());
 			writer.close();
 		} catch (IOException e) {
 			// do something
