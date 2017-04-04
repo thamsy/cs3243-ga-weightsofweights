@@ -6,6 +6,7 @@ JGAPExample26.xml
 bin/*
 
 src/PlayerSkeleton.java
+src/PlayerSkeleton2.java
 src/State.java
 src/TFrame.java
 src/TLabel.java

@@ -29,7 +29,7 @@ public class HeuristicWeightsLearning {
 	// The total number of times we'll let the population evolve.
 	private static final int MAX_ALLOWED_EVOLUTIONS = 45000;
 	private static final int POPULATION_SIZE = 1000;
-	private static final String FILENAME = "GA_mutate2_co2.xml";
+	private static final String FILENAME = "GA_justfeatures_mutate20_co1.xml";
 	public static EvolutionMonitor m_monitor;
 
 	private static void doLearning(int popSize, int numEvo, boolean a_doMonitor) throws Exception {
@@ -45,8 +45,8 @@ public class HeuristicWeightsLearning {
 		conf.setEventManager(new EventManager());
 		conf.setFitnessEvaluator(new DefaultFitnessEvaluator());
 		conf.addNaturalSelector(new StandardPostSelector(conf), true);
-		conf.addGeneticOperator(new MutationOperator(conf, 2));
-		conf.addGeneticOperator(new UniformCrossoverOperator(conf, 2));
+		conf.addGeneticOperator(new MutationOperator(conf, 20));
+		conf.addGeneticOperator(new UniformCrossoverOperator(conf, 1));
 
 		// Set Fitness Function
 		FitnessFunction fitFunc = new HeuristicWeightsFitnessFuction();
@@ -59,16 +59,11 @@ public class HeuristicWeightsLearning {
 		}
 
 		// Set Genes
-		Gene[] sampleGenes = new Gene[9];
-		sampleGenes[0] = new DoubleGene(conf, -1d, 1d); // MinHeight for H1
-		sampleGenes[1] = new DoubleGene(conf, -1d, 1d); // MaxHeight for H1
+		Gene[] sampleGenes = new Gene[4];
+		sampleGenes[0] = new DoubleGene(conf, -1d, 1d); // MaxHeight
+		sampleGenes[1] = new DoubleGene(conf, -1d, 1d); //
 		sampleGenes[2] = new DoubleGene(conf, -1d, 1d); // Constant for H1
 		sampleGenes[3] = new DoubleGene(conf, -1d, 1d); // MinHeight for H2
-		sampleGenes[4] = new DoubleGene(conf, -1d, 1d); // MaxHeight for H2
-		sampleGenes[5] = new DoubleGene(conf, -1d, 1d); // Constant for H2
-		sampleGenes[6] = new DoubleGene(conf, -1d, 1d); // MinHeight for H3
-		sampleGenes[7] = new DoubleGene(conf, -1d, 1d); // MaxHeight for H3
-		sampleGenes[8] = new DoubleGene(conf, -1d, 1d); // Constant for H3
 		IChromosome sampleChromosome = new Chromosome(conf, sampleGenes);
 		conf.setSampleChromosome(sampleChromosome);
 		Genotype population;
@@ -116,11 +111,6 @@ public class HeuristicWeightsLearning {
 		System.out.printf("\tW2 is %f%n", (double) bestSolutionSoFar.getGene(1).getAllele());
 		System.out.printf("\tW3 is %f%n", (double) bestSolutionSoFar.getGene(2).getAllele());
 		System.out.printf("\tW4 is %f%n", (double) bestSolutionSoFar.getGene(3).getAllele());
-		System.out.printf("\tW5 is %f%n", (double) bestSolutionSoFar.getGene(4).getAllele());
-		System.out.printf("\tW6 is %f%n", (double) bestSolutionSoFar.getGene(5).getAllele());
-		System.out.printf("\tW7 is %f%n", (double) bestSolutionSoFar.getGene(6).getAllele());
-		System.out.printf("\tW8 is %f%n", (double) bestSolutionSoFar.getGene(7).getAllele());
-		System.out.printf("\tW9 is %f%n", (double) bestSolutionSoFar.getGene(8).getAllele());
 
 		// Save in file
 		try {
@@ -131,11 +121,6 @@ public class HeuristicWeightsLearning {
 			writer.printf("\tW2 is %f%n", (double) bestSolutionSoFar.getGene(1).getAllele());
 			writer.printf("\tW3 is %f%n", (double) bestSolutionSoFar.getGene(2).getAllele());
 			writer.printf("\tW4 is %f%n", (double) bestSolutionSoFar.getGene(3).getAllele());
-			writer.printf("\tW5 is %f%n", (double) bestSolutionSoFar.getGene(4).getAllele());
-			writer.printf("\tW6 is %f%n", (double) bestSolutionSoFar.getGene(5).getAllele());
-			writer.printf("\tW7 is %f%n", (double) bestSolutionSoFar.getGene(6).getAllele());
-			writer.printf("\tW8 is %f%n", (double) bestSolutionSoFar.getGene(7).getAllele());
-			writer.printf("\tW9 is %f%n", (double) bestSolutionSoFar.getGene(8).getAllele());
 			writer.close();
 		} catch (IOException e) {
 			// do something
