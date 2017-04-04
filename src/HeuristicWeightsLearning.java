@@ -29,7 +29,7 @@ public class HeuristicWeightsLearning {
 	// The total number of times we'll let the population evolve.
 	private static final int MAX_ALLOWED_EVOLUTIONS = 45000;
 	private static final int POPULATION_SIZE = 1000;
-	private static final String FILENAME = "GA_justfeatures_mutate20_co1.xml";
+	private static final String FILENAME = "GA_justfeatures_mutate2_co1_restart.xml";
 	public static EvolutionMonitor m_monitor;
 
 	private static void doLearning(int popSize, int numEvo, boolean a_doMonitor) throws Exception {
@@ -45,7 +45,7 @@ public class HeuristicWeightsLearning {
 		conf.setEventManager(new EventManager());
 		conf.setFitnessEvaluator(new DefaultFitnessEvaluator());
 		conf.addNaturalSelector(new StandardPostSelector(conf), true);
-		conf.addGeneticOperator(new MutationOperator(conf, 20));
+		conf.addGeneticOperator(new MutationOperator(conf, 2));
 		conf.addGeneticOperator(new UniformCrossoverOperator(conf, 1));
 
 		// Set Fitness Function
