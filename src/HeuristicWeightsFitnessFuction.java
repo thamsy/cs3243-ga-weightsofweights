@@ -57,6 +57,7 @@ public class HeuristicWeightsFitnessFuction extends FitnessFunction {
 			int pos = legalMoves[i][State.SLOT];
 			int rowsCleared = performMove(s, newField, newTop, nextPiece, rot, pos);
 			int holes = 0;
+			int blockade = 0;
 			int bumpiness = 0;
 			int maxHeight = 0;
 			int minHeight = State.ROWS;
@@ -77,9 +78,20 @@ public class HeuristicWeightsFitnessFuction extends FitnessFunction {
 						holes += 1;
 					}
 				}
+
+				blocked = false;
+				for (int r = 0; r < newTop[c]; r++) {
+					if (!newField[r][c]) {
+						blocked = true;
+					} else if (newField[r][c] && blocked) {
+						// number of holes
+						blockade += 1;
+					}
+				}
 			}
 
-			double value = calculateValueOfField(weights, maxHeight, minHeight, rowsCleared, holes, bumpiness);
+			double value = calculateValueOfField(weights, maxHeight, minHeight, rowsCleared, holes, blockade,
+					bumpiness);
 			if (value > bestValue) {
 				bestValue = value;
 				bestRot = rot;
@@ -167,9 +179,10 @@ public class HeuristicWeightsFitnessFuction extends FitnessFunction {
 	}
 
 	private double calculateValueOfField(double[] weights, int maxHeight, int minHeight, int rowsCleared, int holes,
-			int bumpiness) {
+			int blockade, int bumpiness) {
 		return weights[0] * (double) maxHeight / 20 + weights[1] * (double) rowsCleared * Math.abs(rowsCleared) / 5
-				+ weights[2] * (double) holes / 10 + weights[3] * (double) bumpiness / 1000;
+				+ weights[2] * (double) holes / 10 + weights[3] * (double) blockade / 20
+				+ weights[4] * (double) bumpiness / 1000;
 	}
 
 	// ----- Main Heuristics ------
