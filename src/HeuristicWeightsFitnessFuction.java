@@ -36,7 +36,7 @@ public class HeuristicWeightsFitnessFuction extends FitnessFunction {
 				// e.printStackTrace();
 				// }
 			}
-			totalValue += (double) s.getRowsCleared() + numPiecesPlayed / 1000d;
+			totalValue += (double) s.getRowsCleared() + numPiecesPlayed / 100000d;
 		}
 
 		return totalValue;

@@ -29,6 +29,7 @@ public class HeuristicWeightsLearning {
 	// The total number of times we'll let the population evolve.
 	private static final int MAX_ALLOWED_EVOLUTIONS = 45000;
 	private static final int POPULATION_SIZE = 1000;
+	private static final String FILENAME = "GA_mutate2_co2.xml";
 	public static EvolutionMonitor m_monitor;
 
 	private static void doLearning(int popSize, int numEvo, boolean a_doMonitor) throws Exception {
@@ -44,8 +45,8 @@ public class HeuristicWeightsLearning {
 		conf.setEventManager(new EventManager());
 		conf.setFitnessEvaluator(new DefaultFitnessEvaluator());
 		conf.addNaturalSelector(new StandardPostSelector(conf), true);
-		conf.addGeneticOperator(new MutationOperator(conf, 10));
-		conf.addGeneticOperator(new UniformCrossoverOperator(conf, 1));
+		conf.addGeneticOperator(new MutationOperator(conf, 2));
+		conf.addGeneticOperator(new UniformCrossoverOperator(conf, 2));
 
 		// Set Fitness Function
 		FitnessFunction fitFunc = new HeuristicWeightsFitnessFuction();
@@ -73,7 +74,7 @@ public class HeuristicWeightsLearning {
 		Genotype population;
 
 		try {
-			Document doc = XMLManager.readFile(new File("GA_mutate10_co1.xml"));
+			Document doc = XMLManager.readFile(new File(FILENAME));
 			population = XMLManager.getGenotypeFromDocument(conf, doc);
 		} catch (UnsupportedRepresentationException uex) {
 			// JGAP codebase might have changed between two consecutive runs.
@@ -101,7 +102,7 @@ public class HeuristicWeightsLearning {
 			// create XML document from generated tree
 			XMLDocumentBuilder docbuilder = new XMLDocumentBuilder();
 			Document xmlDoc = (Document) docbuilder.buildDocument(doc2);
-			XMLManager.writeFile(xmlDoc, new File("GA_mutate10_co1.xml"));
+			XMLManager.writeFile(xmlDoc, new File(FILENAME));
 
 		}
 		long endTime = System.currentTimeMillis();
