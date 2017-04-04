@@ -168,9 +168,9 @@ public class HeuristicWeightsFitnessFuction extends FitnessFunction {
 
 	private double calculateValueOfField(double[] weights, int maxHeight, int minHeight, int rowsCleared, int holes,
 			int bumpiness) {
-		return (weights[0] * maxHeight + weights[1] * minHeight + weights[2]) * rowsCleared
-				+ (weights[3] * maxHeight + weights[4] * minHeight + weights[5]) * holes
-				+ (weights[6] * maxHeight + weights[7] * minHeight + weights[8]) * bumpiness;
+		return (weights[0] * maxHeight + weights[1] * minHeight + weights[2]) * Math.pow(2, rowsCleared) / 10
+				+ (weights[3] * maxHeight + weights[4] * minHeight + weights[5]) * (double) holes / 10
+				+ (weights[6] * maxHeight + weights[7] * minHeight + weights[8]) * (double) bumpiness / 10;
 	}
 
 	// ----- Main Heuristics ------
