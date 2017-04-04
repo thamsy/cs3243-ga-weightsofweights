@@ -5,7 +5,7 @@ import org.jgap.IChromosome;
 public class HeuristicWeightsFitnessFuction extends FitnessFunction {
 
 	public static final int MAX_PIECES = 200000;
-	public static final int NUM_GAMES = 10;
+	public static final int NUM_GAMES = 20;
 
 	// Returns value of fitness function
 	@Override
@@ -39,7 +39,7 @@ public class HeuristicWeightsFitnessFuction extends FitnessFunction {
 			totalValue += (double) s.getRowsCleared() + numPiecesPlayed / 100000d;
 		}
 
-		return totalValue;
+		return totalValue / NUM_GAMES;
 	}
 
 	// Determine which move to make
@@ -56,7 +56,7 @@ public class HeuristicWeightsFitnessFuction extends FitnessFunction {
 			int rot = legalMoves[i][State.ORIENT];
 			int pos = legalMoves[i][State.SLOT];
 			int rowsCleared = performMove(s, newField, newTop, nextPiece, rot, pos);
-			// int holes = 0;
+			int holes = 0;
 			int blockade = 0;
 			int bumpiness = 0;
 			int maxHeight = 0;
@@ -70,9 +70,10 @@ public class HeuristicWeightsFitnessFuction extends FitnessFunction {
 				if (c > 0)
 					bumpiness += (newTop[c] - newTop[c - 1]) * (newTop[c] - newTop[c - 1]);
 				boolean blocked = false;
-				for (int r = 0; r <= newTop[c]; r++) {
+				for (int r = 0; r < newTop[c]; r++) {
 					if (!newField[r][c]) {
 						blocked = true;
+						holes++;
 					} else if (newField[r][c] && blocked) {
 						// number of holes
 						blockade++;
@@ -80,7 +81,8 @@ public class HeuristicWeightsFitnessFuction extends FitnessFunction {
 				}
 			}
 
-			double value = calculateValueOfField(weights, maxHeight, minHeight, rowsCleared, blockade, bumpiness);
+			double value = calculateValueOfField(weights, maxHeight, minHeight, rowsCleared, holes, blockade,
+					bumpiness);
 			if (value > bestValue) {
 				bestValue = value;
 				bestRot = rot;
@@ -167,10 +169,11 @@ public class HeuristicWeightsFitnessFuction extends FitnessFunction {
 		return rowsCleared;
 	}
 
-	private double calculateValueOfField(double[] weights, int maxHeight, int minHeight, int rowsCleared, int blockade,
-			int bumpiness) {
-		return weights[0] * (double) maxHeight / 20 + weights[1] * (double) rowsCleared * Math.abs(rowsCleared) / 5
-				+ weights[2] * (double) blockade / 10 + weights[3] * (double) bumpiness / 1000;
+	private double calculateValueOfField(double[] weights, int maxHeight, int minHeight, int rowsCleared, int holes,
+			int blockade, int bumpiness) {
+		return weights[0] * (double) maxHeight / 20 + weights[1] * (double) rowsCleared * Math.abs(rowsCleared)
+				+ weights[2] * (double) holes / 10 + weights[3] * (double) blockade / 10
+				+ weights[4] * (double) bumpiness / 1000;
 	}
 
 	// ----- Main Heuristics ------
