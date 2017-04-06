@@ -4,7 +4,7 @@ import org.jgap.IChromosome;
 
 public class HeuristicWeightsFitnessFuction extends FitnessFunction {
 
-	public static final int MAX_PIECES = 200000;
+	// public static final int MAX_PIECES = 200000;
 	public static final int NUM_GAMES = 20;
 
 	// Returns value of fitness function
@@ -25,7 +25,7 @@ public class HeuristicWeightsFitnessFuction extends FitnessFunction {
 			State s = new State();
 			// new TFrame(s);
 			double numPiecesPlayed = 0.0d;
-			while (!s.hasLost() && numPiecesPlayed < MAX_PIECES) {
+			while (!s.hasLost()) { // && numPiecesPlayed < MAX_PIECES) {
 				s.makeMove(findNextMove(s, weights));
 				// s.draw();
 				// s.drawNext(0, 0);
